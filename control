@@ -1,0 +1,9 @@
+Package: com.cobradarsh.keepawake
+Name: KeepAwake
+Version: 0.0.1
+Architecture: iphoneos-arm64
+Description: Keep the screen awake while chosen apps are open — overrides auto-lock and Low Power Mode. Toggle apps on/off in Settings.
+Maintainer: cobradarsh
+Author: cobradarsh
+Section: Tweaks
+Depends: mobilesubstrate, preferenceloader

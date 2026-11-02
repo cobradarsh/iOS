@@ -1,0 +1,48 @@
+name: Build .deb
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: brew install ldid xz make
+
+      - name: Set up Theos (RootHide fork)
+        run: |
+          git clone --quiet --recursive https://github.com/roothide/theos.git "$HOME/theos"
+          echo "THEOS=$HOME/theos" >> "$GITHUB_ENV"
+
+      - name: Build packages
+        run: |
+          export THEOS="$HOME/theos"
+          mkdir -p out
+
+          echo "::group::rootless build"
+          make clean
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+          cp packages/*.deb out/ 2>/dev/null || true
+          echo "::endgroup::"
+
+          echo "::group::roothide build"
+          make clean
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide || echo "roothide build skipped/failed"
+          cp packages/*.deb out/ 2>/dev/null || true
+          echo "::endgroup::"
+
+          echo "=== built packages ==="
+          ls -la out
+
+      - name: Upload .deb packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: KeepAwake-debs
+          path: out/*.deb
+          if-no-files-found: error

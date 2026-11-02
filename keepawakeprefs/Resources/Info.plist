@@ -1,0 +1,10 @@
+{
+	CFBundleDevelopmentRegion = "English";
+	CFBundleExecutable = "KeepAwakePrefs";
+	CFBundleIdentifier = "com.cobradarsh.keepawakeprefs";
+	CFBundleInfoDictionaryVersion = "6.0";
+	CFBundleName = "KeepAwakePrefs";
+	CFBundlePackageType = "BNDL";
+	CFBundleVersion = "1.0";
+	NSPrincipalClass = "KAKRootListController";
+}

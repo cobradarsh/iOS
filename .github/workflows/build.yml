@@ -22,23 +22,30 @@ jobs:
 
       - name: Install iOS SDKs (with private-framework stubs)
         run: |
+          rm -rf "$HOME/theos/sdks"
           git clone --quiet --depth 1 https://github.com/theos/sdks.git "$HOME/theos/sdks"
-          echo "Installed SDKs:" && ls "$HOME/theos/sdks" | grep -i iphoneos || true
+          echo "Installed iPhoneOS SDKs:"
+          ls -d "$HOME/theos/sdks"/iPhoneOS*.sdk | sort -V
 
       - name: Build packages
         run: |
           export THEOS="$HOME/theos"
           mkdir -p out
 
+          # Force the theos/sdks SDK (it carries private-framework stubs like
+          # Preferences); otherwise "latest" may resolve to Xcode's stock SDK.
+          SDK=$(ls -d "$HOME/theos/sdks"/iPhoneOS*.sdk | sort -V | tail -1)
+          echo "Using SDK: $SDK"
+
           echo "::group::rootless build"
           make clean
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless SYSROOT="$SDK"
           cp packages/*.deb out/ 2>/dev/null || true
           echo "::endgroup::"
 
           echo "::group::roothide build"
           make clean
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide || echo "roothide build skipped/failed"
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide SYSROOT="$SDK" || echo "roothide build skipped/failed"
           cp packages/*.deb out/ 2>/dev/null || true
           echo "::endgroup::"
 

@@ -20,6 +20,11 @@ jobs:
           git clone --quiet --recursive https://github.com/roothide/theos.git "$HOME/theos"
           echo "THEOS=$HOME/theos" >> "$GITHUB_ENV"
 
+      - name: Install iOS SDKs (with private-framework stubs)
+        run: |
+          git clone --quiet --depth 1 https://github.com/theos/sdks.git "$HOME/theos/sdks"
+          echo "Installed SDKs:" && ls "$HOME/theos/sdks" | grep -i iphoneos || true
+
       - name: Build packages
         run: |
           export THEOS="$HOME/theos"
